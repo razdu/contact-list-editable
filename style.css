@@ -1,0 +1,15 @@
+body {
+    font-size: 15pt;
+    box-sizing: border-box;
+}
+button {
+	background-color: skyblue;
+	color: darkblue;
+	border: 1px darkblue solid;
+	border-radius: 3px;
+	box-shadow: 2px 2px 1px;
+}
+table{
+	border-collapse: collapse;
+	text-align: center;
+}
