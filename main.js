@@ -3,104 +3,42 @@ let lName = document.querySelector('#lName');
 let phone = document.querySelector('#phone');
 let email = document.querySelector('#email');
 let id = 0,
-	contacts = [];
-const ls = localStorage,
+	contacts = [],
 	toShow = [];
+const ls = localStorage;
 let nm = 'contacts';
 setFirstIfNotExist(nm, []);
 setFirstIfNotExist(nm + 'id', id);
-renderTable(nm);
+renderContactTable(nm);
 /* 
 catch fields
 check for empty fields
 check highest id
 save item to local storage
 */
-function setFirstIfNotExist(key, val) {
-	if (!ls[key]) {
-		ls.setItem(key, JSON.stringify(val));
-		console.log(key + ' initialized...');
-	}
-}
-
-function getLocalItem(item) {
-	// body...
-	console.log(item + ' from local...');
-	return JSON.parse(ls.getItem(item));
-}
-
-document.querySelector('#addBtn').addEventListener('click', (e) => {
-	e.preventDefault();
-	//setFirstIfNotExist(nm, contacts);
-
-	let data = getDataValues(nm);
-	contacts = getLocalItem(nm);
-	id = getLocalItem(nm + 'id');
-	data['id'] = ++id;
-	console.log(contacts);
-	if (data) {
-		contacts.push(data);
-		saveLocalItem(contacts, nm);
-		saveLocalItem(id, nm + 'id')
-		resetDataValues();
-		console.log('updated...');
-	}
-	else {
-		console.log('first and last name can not be empty!!');
-		console.log('Not updated...');
-	}
-
-})
-
-document.querySelector('#resetBtn').addEventListener('click', (e) => {
-	e.preventDefault();
-	resetDataValues();
-})
-
-function getDataValues(nm) {
-	if (!fName.value == '' &&
-		!lName.value == '' &&
-		(!phone.value == '' ||
-			!email.value == '')) {
-		console.log('collecting...');
-		return {
-			fName: fName.value,
-			lName: lName.value,
-			phone: phone.value,
-			email: email.value,
-			onTable:false,
-		}
-	}
-	else {
-		console.log("error");
-		return false
-	}
-}
-
-function resetDataValues() {
-	// body...
-	fName.value = "";
-	lName.value = "";
-	phone.value = "";
-	email.value = "";
-	console.log('reset...');
-	renderTable(nm);
-}
-
-function saveLocalItem(obj, nm) {
-	//console.log(obj);
-
-	if (nm) {
-		let data = JSON.stringify(obj);
-		ls.setItem(nm, data);
-		return true
-	} else {
-		return false
-	}
-}
-
-function renderTable(nm) {
-	// body...
+function renderContactTable(nm) {
+	// get table to print data
+	// get data from local storage
+	// set new item to store id of record to display
+	let tblBody = document.querySelector('#contactsTbl tbody');
+	console.log(tblBody);
+	contacts = getLocalItem('contacts');
+	toShow = contacts.filter((contact) => {
+		return !contact.onTable 
+	})
+	tblBody.innerHTML = '';
+	/* toShow.forEach(person => {
+		tblBody.innerHTML +=
+			`<tr>
+		<td>${person.fName}</td>
+		<td>${person.lName}</td>
+		<td>${person.phone}</td>
+		<td>${person.email}</td>
+		</tr>`
+	}) */
+	console.log('to show:', toShow);
+	console.log('Contact:', contacts);
+	/* 	// body...
 	console.log('loading data..');
 	let tbl = nm + 'Tbl';
 	//tbl = document.querySelector(tbl);
@@ -132,5 +70,89 @@ function renderTable(nm) {
 			//cell1.innerHTML = "NEW CELL1";
 			//cell2.innerHTML = "NEW CELL2";
 		}
+	}*/
+
+
+
+}
+
+function setFirstIfNotExist(key, val) {
+	if (!ls[key]) {
+		ls.setItem(key, JSON.stringify(val));
+		console.log(key + ' initialized...');
+	}
+}
+
+function getLocalItem(item) {
+	// body...
+	console.log(item + ' from local...');
+	return JSON.parse(ls.getItem(item));
+}
+
+document.querySelector('#addBtn').addEventListener('click', (e) => {
+	e.preventDefault();
+	//setFirstIfNotExist(nm, contacts);
+
+	let data = getDataValues(nm);
+	contacts = getLocalItem(nm);
+	id = getLocalItem(nm + 'id');
+	data['id'] = ++id;
+	console.log(contacts);
+	if (data) {
+		contacts.push(data);
+		saveLocalItem(contacts, nm);
+		saveLocalItem(id, nm + 'id')
+		resetDataValues();
+		console.log('updated...');
+	} else {
+		console.log('first and last name can not be empty!!');
+		console.log('Not updated...');
+	}
+
+})
+
+document.querySelector('#resetBtn').addEventListener('click', (e) => {
+	e.preventDefault();
+	resetDataValues();
+})
+
+function getDataValues(nm) {
+	if (!fName.value == '' &&
+		!lName.value == '' &&
+		(!phone.value == '' ||
+			!email.value == '')) {
+		console.log('collecting...');
+		return {
+			fName: fName.value,
+			lName: lName.value,
+			phone: phone.value,
+			email: email.value,
+			onTable: false,
+		}
+	} else {
+		console.log("error");
+		return false
+	}
+}
+
+function resetDataValues() {
+	// body...
+	fName.value = "";
+	lName.value = "";
+	phone.value = "";
+	email.value = "";
+	console.log('reset...');
+	renderContactTable(nm);
+}
+
+function saveLocalItem(obj, nm) {
+	//console.log(obj);
+
+	if (nm) {
+		let data = JSON.stringify(obj);
+		ls.setItem(nm, data);
+		return true
+	} else {
+		return false
 	}
 }
