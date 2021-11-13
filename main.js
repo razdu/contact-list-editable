@@ -2,11 +2,13 @@ let fName = document.querySelector('#fName');
 let lName = document.querySelector('#lName');
 let phone = document.querySelector('#phone');
 let email = document.querySelector('#email');
+let tblBody = document.querySelector('#contactsTbl tbody');
 let id = 0,
 	contacts = [],
 	toShow = [];
 const ls = localStorage;
 let nm = 'contacts';
+contacts = getLocalItem(nm);
 setFirstIfNotExist(nm, []);
 setFirstIfNotExist(nm + 'id', id);
 renderContactTable(nm);
@@ -17,76 +19,42 @@ check highest id
 save item to local storage
 */
 function renderContactTable(nm) {
-	// get table to print data
-	// get data from local storage
-	// set new item to store id of record to display
-	let tblBody = document.querySelector('#contactsTbl tbody');
-	console.log(tblBody);
-	contacts = getLocalItem('contacts');
-	toShow = contacts.filter((contact) => {
-		return !contact.onTable 
+	let contacts = getLocalItem(nm);
+	contacts.forEach((lc) => {
+		console.log(lc);
+		toShow.push(lc.id);
 	})
-	tblBody.innerHTML = '';
-	/* toShow.forEach(person => {
-		tblBody.innerHTML +=
-			`<tr>
-		<td>${person.fName}</td>
-		<td>${person.lName}</td>
-		<td>${person.phone}</td>
-		<td>${person.email}</td>
-		</tr>`
-	}) */
-	console.log('to show:', toShow);
-	console.log('Contact:', contacts);
-	/* 	// body...
-	console.log('loading data..');
-	let tbl = nm + 'Tbl';
-	//tbl = document.querySelector(tbl);
-	//let newEntry =
-	console.log(tbl);
-	let data = getLocalItem(nm);
-	if (data.length == 0) {
-		console.log(data);
-		console.log('data:no data exist...');
-	}
-	else {
-		console.log('data:', data);
-
-		// Find a <table> element with id="myTable":
-		let table = document.getElementById(tbl);
-		console.log(table);
-		for (var i = 0; i < data.length && toShow[i]; i++) {
-			// Create an empty <tr> element and add it to the 1st position of the table:
-			let row = table.insertRow(i + 1);
-
-			// Insert new cells (<td> elements) at the 1st and 2nd position of the "new" <tr> element:
-			row.insertCell(0).innerHTML = data[i].fName;
-			row.insertCell(1).innerHTML = data[i].lName;
-			row.insertCell(2).innerHTML = data[i].phone;
-			row.insertCell(3).innerHTML = data[i].email;
-			console.log('row ~' + i);
-			toShow[i]=true
-			// Add some text to the new cells:
-			//cell1.innerHTML = "NEW CELL1";
-			//cell2.innerHTML = "NEW CELL2";
+	console.log("toShow", toShow);
+	console.log(tblBody);
+	tblBody.innerText = ''
+	for (let i = 0; i < toShow.length; i++) {
+		for (let j = 0; j < contacts.length; j++) {
+			if (toShow[i] == contacts[j].id) {
+				//console.log('id of lc exist');
+				tblBody.innerHTML += `<tr>
+				<td>${contacts[j].fName}</td>
+				<td>${contacts[j].lName}</td>
+				<td>${contacts[j].phone}</td>
+				<td>${contacts[j].email}</td>
+				<td>${contacts[j].onTable}</td></tr>`
+			}
 		}
-	}*/
-
-
-
+	}
 }
+
+document.querySelector('#refresh').addEventListener('click', (e)=>{
+	e.preventDefault();
+	console.log('id:',id);
+	console.log('contacts:',contacts);
+	console.log('toShow:',toShow);
+	
+})
 
 function setFirstIfNotExist(key, val) {
 	if (!ls[key]) {
 		ls.setItem(key, JSON.stringify(val));
 		console.log(key + ' initialized...');
 	}
-}
-
-function getLocalItem(item) {
-	// body...
-	console.log(item + ' from local...');
-	return JSON.parse(ls.getItem(item));
 }
 
 document.querySelector('#addBtn').addEventListener('click', (e) => {
@@ -110,6 +78,7 @@ document.querySelector('#addBtn').addEventListener('click', (e) => {
 	}
 
 })
+
 
 document.querySelector('#resetBtn').addEventListener('click', (e) => {
 	e.preventDefault();
@@ -142,12 +111,15 @@ function resetDataValues() {
 	phone.value = "";
 	email.value = "";
 	console.log('reset...');
-	renderContactTable(nm);
+}
+
+function getLocalItem(item) {
+	// body...
+	console.log(item + ' from local...');
+	return JSON.parse(ls.getItem(item));
 }
 
 function saveLocalItem(obj, nm) {
-	//console.log(obj);
-
 	if (nm) {
 		let data = JSON.stringify(obj);
 		ls.setItem(nm, data);
