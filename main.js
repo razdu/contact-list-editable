@@ -19,35 +19,45 @@ check highest id
 save item to local storage
 */
 function renderContactTable(nm) {
-	let contacts = getLocalItem(nm);
 	contacts.forEach((lc) => {
 		console.log(lc);
 		toShow.push(lc.id);
 	})
 	console.log("toShow", toShow);
 	console.log(tblBody);
-	tblBody.innerText = ''
-	for (let i = 0; i < toShow.length; i++) {
-		for (let j = 0; j < contacts.length; j++) {
-			if (toShow[i] == contacts[j].id) {
-				//console.log('id of lc exist');
-				tblBody.innerHTML += `<tr>
-				<td>${contacts[j].fName}</td>
-				<td>${contacts[j].lName}</td>
-				<td>${contacts[j].phone}</td>
-				<td>${contacts[j].email}</td>
-				<td>${contacts[j].onTable}</td></tr>`
+	tblBody.innerText = '';
+	let toRow = contacts.filter((c) => {
+		let flag = 0;
+		for (let i = 1; i <= toShow.length; i++) {
+			flag = (c.id + 1) == toShow[i] ? true : false;
+			if (flag) {
+				return 1
+			} else {
+				return 0
 			}
 		}
+	})
+	console.log('toRow:', toRow);
+	for (let i = 0; i < toRow.length; i++) {
+		//console.log('id of lc exist');
+		tblBody.innerHTML += `<tr>
+				<td>${toRow[i].fName}</td>
+				<td>${toRow[i].lName}</td>
+				<td>${toRow[i].phone}</td>
+				<td>${toRow[i].email}</td>
+				<td>${toRow[i].onTable}</td></tr>`
+		//toRow[i].unshift()
 	}
+	console.log('toRow:', toRow);
 }
 
-document.querySelector('#refresh').addEventListener('click', (e)=>{
+document.querySelector('#refresh').addEventListener('click', (e) => {
 	e.preventDefault();
-	console.log('id:',id);
-	console.log('contacts:',contacts);
-	console.log('toShow:',toShow);
-	
+	console.log('id:', id);
+	console.log('contacts:', contacts);
+	console.log('toShow:', toShow);
+	console.log(tblBody.rows.length);
+
 })
 
 function setFirstIfNotExist(key, val) {
@@ -60,7 +70,6 @@ function setFirstIfNotExist(key, val) {
 document.querySelector('#addBtn').addEventListener('click', (e) => {
 	e.preventDefault();
 	//setFirstIfNotExist(nm, contacts);
-
 	let data = getDataValues(nm);
 	contacts = getLocalItem(nm);
 	id = getLocalItem(nm + 'id');
@@ -72,11 +81,11 @@ document.querySelector('#addBtn').addEventListener('click', (e) => {
 		saveLocalItem(id, nm + 'id')
 		resetDataValues();
 		console.log('updated...');
+		renderContactTable(nm);
 	} else {
 		console.log('first and last name can not be empty!!');
 		console.log('Not updated...');
 	}
-
 })
 
 
