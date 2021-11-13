@@ -13,3 +13,6 @@ table{
 	border-collapse: collapse;
 	text-align: center;
 }
+tr.odd{
+	background-color: lightblue;
+}

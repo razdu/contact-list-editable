@@ -93,13 +93,10 @@ function saveLocalItem(obj, nm) {
 	if (nm) {
 		let data = JSON.stringify(obj);
 		ls.setItem(nm, data);
-
-
 		return true
 	} else {
 		return false
 	}
-
 }
 
 function renderTable(nm) {
@@ -121,7 +118,6 @@ function renderTable(nm) {
 		let table = document.getElementById(tbl);
 		console.log(table);
 		for (var i = 0; i < data.length && toShow[i]; i++) {
-			//data[i]
 			// Create an empty <tr> element and add it to the 1st position of the table:
 			let row = table.insertRow(i + 1);
 
