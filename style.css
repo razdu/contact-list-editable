@@ -12,6 +12,7 @@ button {
 table{
 	border-collapse: collapse;
 	text-align: center;
+	width: 100%;
 }
 tr.odd{
 	background-color: lightblue;

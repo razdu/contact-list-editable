@@ -11,53 +11,58 @@ let nm = 'contacts';
 contacts = getLocalItem(nm);
 setFirstIfNotExist(nm, []);
 setFirstIfNotExist(nm + 'id', id);
-renderContactTable(nm);
+renderContactTable(nm, true);
 /* 
 catch fields
 check for empty fields
 check highest id
 save item to local storage
 */
-function renderContactTable(nm) {
+function renderContactTable() {
 	contacts.forEach((lc) => {
-		console.log(lc);
-		toShow.push(lc.id);
+		//console.log(lc);
+		row = tblBody.insertRow(tblBody.length);
+		row.insertCell(0).innerHTML = lc.fName;
+		row.insertCell(1).innerHTML = lc.lName;
+		row.insertCell(2).innerHTML = lc.phone;
+		row.insertCell(3).innerHTML = lc.email;
+		row.insertCell(4).innerHTML = lc.id;
+		row.insertCell(5).innerHTML = `<button act='del' onClick=removeRecord(this)>&#x232B</button>
+										<button act='edit' onClick=editRecord(this)>&#x270E</button>`;
 	})
-	console.log("toShow", toShow);
-	console.log(tblBody);
-	tblBody.innerText = '';
-	let toRow = contacts.filter((c) => {
-		let flag = 0;
-		for (let i = 1; i <= toShow.length; i++) {
-			flag = (c.id + 1) == toShow[i] ? true : false;
-			if (flag) {
-				return 1
-			} else {
-				return 0
-			}
-		}
-	})
-	console.log('toRow:', toRow);
-	for (let i = 0; i < toRow.length; i++) {
-		//console.log('id of lc exist');
-		tblBody.innerHTML += `<tr>
-				<td>${toRow[i].fName}</td>
-				<td>${toRow[i].lName}</td>
-				<td>${toRow[i].phone}</td>
-				<td>${toRow[i].email}</td>
-				<td>${toRow[i].onTable}</td></tr>`
-		//toRow[i].unshift()
-	}
-	console.log('toRow:', toRow);
+}
+
+function addNewRecord(data) {
+	row = tblBody.insertRow();
+	row.insertCell(0).innerHTML = data.fName;
+	row.insertCell(1).innerHTML = data.lName;
+	row.insertCell(2).innerHTML = data.phone;
+	row.insertCell(3).innerHTML = data.email;
+	row.insertCell(4).innerHTML = data.id;
+	row.insertCell(5).innerHTML = `<button act='del' onClick=removeRecord(this)>&#x232B</button>
+									<button act='edit'>&#x270E</button>`;
+}
+
+function removeRecord(td) {
+	console.log(td.parentElement.parentElement);
+	row = td.parentElement.parentElement;
+	rowId = row.cells[4];
+	//remove from local
+	console.log('row deleted');
+	row.remove();
+}
+function editRecord(td) {
+	row = td.parentElement.parentElement;
+	fName.value = row.cells[0].innerHTML;
+	lName.value = row.cells[1].innerHTML;
+	phone.value = row.cells[2].innerHTML;
+	email.value = row.cells[3].innerHTML;
 }
 
 document.querySelector('#refresh').addEventListener('click', (e) => {
 	e.preventDefault();
 	console.log('id:', id);
 	console.log('contacts:', contacts);
-	console.log('toShow:', toShow);
-	console.log(tblBody.rows.length);
-
 })
 
 function setFirstIfNotExist(key, val) {
