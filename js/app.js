@@ -1,26 +1,27 @@
 let tbl = document.querySelector('#contacts-tbl tbody');
-const contacts = {},
-    favContacts = {}
+const contactKeys = ['fname', 'lname', 'phone', 'email', 'id'],
+    ls = localStorage;
 let contactID = 0,
+
+    errMsg = [],
+    contacts = [],
     selectedRow = null;
-//addRecord(['first', 'last', 'phone', 'email', 'ID']);
-const ls = localStorage;
+
 setContactID();
+loadFromLocal();
 
 function setContactID() {
     console.log('processing ID..')
-    // get from local
-    let cID = getFromLocal('contactID', contactID);
-    //console.log('cID = ', cID);
-    if (contactID != 0 || cID) {
+    //get from local
+    let item = 'contactID';
+    let cID = getFromLocal(item, false);
+    if (!cID) {
         //if this app ID not zero OR have local value
-        console.log('contactID not zero...take highest ID!');
-        //console.log('contactID = ', contactID);
-        contactID = contactID > cID ? contactID : cID;
-        addLocal('contactID', contactID)
-    } else if (contactID == 0) {
-        console.log('contactID is ' + contactID);
-        //console.log('contactID = ', contactID);
+        contactID = contactID >= cID ? contactID : cID;
+        addLocal(item, contactID);
+    } else if (cID) {
+        //addLocal(item, contactID);
+        console.log('local updated');
     } else {
         console.log('error');
     }
@@ -28,41 +29,59 @@ function setContactID() {
     return contactID
 }
 
-function onSubmit() {
+function onSubmit(selectedRow = null) {
     console.log('submitted!');
     let formData = getFormData();
-    console.log(formData.length);
-    formData[formData.length] = setContactID();
-    if (selectedRow == null) {
-        //Add new record
-        addRecord(formData);
-
-        //keep to local
-        //addLocal(formData);
-
-
-    } else {
-        //update this record
+    let item = 'contacts';
+    if (formData) {
+        formData['id'] = ++contactID;
+        setContactID();
+        console.log('got -->', formData);
+        if (selectedRow == null) {
+            //Add new record
+            addRecord(formData);
+            console.log('add record: ', formData);
+            contacts = getFromLocal('contacts', contacts);
+            contacts.push(formData);
+            addLocal('contacts', contacts);
+            //keep to local
+            //addLocal(formData);
+        } else {
+            //update this record
+            updateRecord();
+        }
     }
+
 }
 
 function getFormData() {
     let inputData = document.querySelectorAll('input');
-    let dataArr = [];
+    let dataObj = {};
+    errMsg = [];
+    console.log('collecting: ', inputData);
     inputData.forEach((inpt) => {
-        //console.log(inpt.value);
-        if(inpt==''){
+        if (inpt.value == '') {
             //if empty string
-            errMsg.push = `${inpt.name} can't be empty`
-        }else{
+            errMsg.push(`${inpt.name} can't be empty`);
+        } else {
             //not empty
-            dataArr.push(inpt.value)
+            dataObj[inpt.name] = inpt.value;
         }
-    })
-    //dataArr.pop();
-    console.log(dataArr);
-    resetInputs(inputData)
-    return dataArr
+        console.log(inpt.value);
+
+    });
+    console.log(errMsg.length == 0);
+    if (errMsg.length == 0) {
+        //if no errors found
+        resetInputs(inputData);
+        showErrors(false);
+    } else {
+        showErrors(errMsg);
+    }
+    console.log('obj-->' + dataObj);
+    console.log('contacts:\n' + contacts);
+
+    return dataObj
 }
 
 function resetInputs(inputs) {
@@ -71,15 +90,26 @@ function resetInputs(inputs) {
     })
 }
 
+function loadFromLocal() {
+    contacts = getFromLocal('contacts', false);
+    /* contacts.forEach(c => {
+        addRecord(c);
+    }); */
+    console.log('local loaded');
+}
+
 function addRecord(formData) {
     let row = tbl.insertRow(tbl.length);
-    console.log(row);
     let dataCells = [];
-    formData.forEach((d, i) => {
+    for (let i = 0; i < contactKeys.length; i++) {
         dataCells[i] = row.insertCell()
-        dataCells[i].innerHTML = d;
-        i++;
-    })
+        dataCells[i].innerHTML = formData[contactKeys[i]];
+    }
+    /*formData.forEach((d, i) => {
+    	dataCells[i] = row.insertCell()
+    	dataCells[i].innerHTML = d;
+    	i++;
+    })*/
     actCell = row.insertCell()
     actCell.innerHTML = `<button onclick='editRecord(this)'>Edit</button>
     <button onclick='removeRecord(this)'>X</button>`
@@ -87,7 +117,7 @@ function addRecord(formData) {
     return
 }
 
-function editRecord() {
+function editRecord(data) {
     console.log('to edit...');
     //selectedRow = 
 }
@@ -101,46 +131,43 @@ function removeRecord() {
 }
 
 function addLocal(item, data) {
-    let obj = {};
-    obj[item] = data;
-    let local = JSON.stringify(obj);
+    //add to locall an item with the name inside 'item' with the 'data' content
+    let local = JSON.stringify(data);
+    console.log('set item: ' + local);
     ls.setItem(item, local);
-    return obj
 }
 
 function getFromLocal(item, data) {
+    //get from local 'item' obj
     console.log('searching local ' + item);
     let local = ls.getItem(item);
     if (local) {
-        //if localize
-        console.log('Found!');
-        console.log('get ' + item + ' value...');
+        //if localize = if local not empty string
+        console.log('Found... ' + local);
         data = JSON.parse(local);
-        console.log('data --> ', data);
     } else {
-        //if NOT localize
+        //if NOT localize=if local empy string
         console.log('NOT found!');
-        console.log('set local ' + item);
-        data = addLocal(item, data);
-        console.log('data --> ', data);
+        addLocal(item, data);
     }
-    console.log(`got from local < ${data[item]} > \n\t\tDONE!`);
-    return data[item]
+    console.log(`got from local < ${item} > \n\t\tDONE!`);
+    return data
 }
-toggleClass(['first', 'last']);
 
-function toggleClass(errMsg = false) {
+function showErrors(errMsg) {
+    let errBox = document.querySelector('#errorBox');
     let elem = document.querySelector('#errorMsg');
-    //debugger
+    elem.innerHTML = '';
     if (errMsg) {
-        elem.classList.remove('hide');
+        errBox.classList.remove('hide');
         errMsg.forEach((err) => {
             let msg = document.createElement('p');
             msg.innerHTML = err;
             elem.appendChild(msg);
         })
     } else {
-        elem.classList.add('hide');
+        errBox.classList.add('hide');
+        console.log('no errors found..');
     }
-    console.log('no errors found..');
+
 }
