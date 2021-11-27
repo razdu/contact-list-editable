@@ -13,8 +13,7 @@ legend {
 }
 
 fieldset {
-    position: relative;
-    width: 500px;
+    position: relative
 }
 
 fieldset input {
